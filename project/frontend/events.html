@@ -18,6 +18,7 @@
         .modal-overlay.open .modal { transform: scale(1); }
         input, select, textarea { width: 100%; padding: 0.75rem 1rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 0.875rem; color: white; background: rgba(255,255,255,0.05); outline: none; transition: border-color 0.2s; }
         input:focus, select:focus, textarea:focus { border-color: #FF4500; }
+        select option { background-color: #111; color: white; } /* Fix for invisible options */
         .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 6px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .event-card:hover { border-color: rgba(255, 69, 0, 0.4); }
