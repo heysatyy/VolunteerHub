@@ -45,8 +45,14 @@ router.delete('/:id', protect, coordinatorOrAdmin, async (req, res) => {
 
 router.post('/:id/assign', protect, coordinatorOrAdmin, async (req, res) => {
   try {
-    await db.run('INSERT OR IGNORE INTO event_assignments (event_id, volunteer_id) VALUES (?,?)',
-      [req.params.id, req.body.volunteer_id]);
+    const isPg = !!process.env.DATABASE_URL;
+    if (isPg) {
+      await db.run('INSERT INTO event_assignments (event_id, volunteer_id) VALUES (?,?) ON CONFLICT DO NOTHING',
+        [req.params.id, req.body.volunteer_id]);
+    } else {
+      await db.run('INSERT OR IGNORE INTO event_assignments (event_id, volunteer_id) VALUES (?,?)',
+        [req.params.id, req.body.volunteer_id]);
+    }
     res.json({ success: true, message: 'Volunteer assigned.' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error.' });

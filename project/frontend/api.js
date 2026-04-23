@@ -8,8 +8,8 @@ const API_BASE = window.location.hostname === 'localhost' || window.location.hos
 
 
 // ── Token helpers ─────────────────────────────────────────
-function getToken()        { return localStorage.getItem('vh_token'); }
-function getUser()         { return JSON.parse(localStorage.getItem('vh_user') || 'null'); }
+function getToken() { return localStorage.getItem('vh_token'); }
+function getUser() { return JSON.parse(localStorage.getItem('vh_user') || 'null'); }
 function setAuth(token, user) {
   localStorage.setItem('vh_token', token);
   localStorage.setItem('vh_user', JSON.stringify(user));
@@ -18,7 +18,7 @@ function clearAuth() {
   localStorage.removeItem('vh_token');
   localStorage.removeItem('vh_user');
 }
-function isLoggedIn()      { return !!getToken(); }
+function isLoggedIn() { return !!getToken(); }
 function redirectIfGuest() {
   if (!isLoggedIn()) { window.location.href = 'index.html'; }
 }
@@ -59,7 +59,7 @@ async function apiRegister(payload) {
 }
 
 // ── Dashboard ─────────────────────────────────────────────
-async function apiDashboard()    { return api('/dashboard/summary'); }
+async function apiDashboard() { return api('/dashboard/summary'); }
 
 // ── Volunteers ────────────────────────────────────────────
 async function apiGetVolunteers(params = {}) {
@@ -91,7 +91,7 @@ async function apiUpdateDonation(id, payload) {
 }
 
 // ── Events ────────────────────────────────────────────────
-async function apiGetEvents()  { return api('/events'); }
+async function apiGetEvents() { return api('/events'); }
 async function apiAddEvent(payload) {
   return api('/events', { method: 'POST', body: JSON.stringify(payload) });
 }

@@ -13,11 +13,19 @@ router.get('/stats', protect, async (req, res) => {
     const count    = await db.get("SELECT COUNT(*) AS cnt FROM donations");
     const pending  = await db.get("SELECT SUM(amount) AS total FROM donations WHERE status='pending'");
 
+    const isPg = !!process.env.DATABASE_URL;
+    const monthSql = isPg 
+      ? "EXTRACT(MONTH FROM donated_at::TIMESTAMP)" 
+      : "strftime('%m', donated_at)";
+    const yearSql = isPg 
+      ? "EXTRACT(YEAR FROM donated_at::TIMESTAMP) = EXTRACT(YEAR FROM CURRENT_DATE)" 
+      : "strftime('%Y', donated_at) = strftime('%Y', 'now')";
+
     const byMonth = await db.all(`
-      SELECT CAST(strftime('%m', donated_at) AS INTEGER) AS month,
+      SELECT CAST(${monthSql} AS INTEGER) AS month,
              SUM(amount) AS total
       FROM donations WHERE status='confirmed'
-        AND strftime('%Y', donated_at) = strftime('%Y', 'now')
+        AND ${yearSql}
       GROUP BY month ORDER BY month
     `);
 
