@@ -4,7 +4,7 @@
 // Use the deployed backend URL if available, otherwise fallback to localhost
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:5000/api'
-  : 'https://volunteerhub-9crd.onrender.com'; // Replace this after hosting on Render
+  : 'https://volunteerhub-9crd.onrender.com/api'; // Replace this after hosting on Render
 
 
 // ── Token helpers ─────────────────────────────────────────
