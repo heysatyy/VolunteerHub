@@ -74,6 +74,7 @@
         .util-bar.donated { background: #40916c; }
         .util-bar.spent { background: var(--accent); }
     </style>
+    <script src="api.js"></script>
 </head>
 <body>
     <div class="min-h-screen bg-[#050505] selection:bg-[#FF4500] selection:text-white pb-20">
@@ -298,23 +299,8 @@
 
     <script>
         // ── Auth & API ─────────────────────────────────────────────
-        const API_BASE = 'http://localhost:5000/api';
-        function getToken()        { return localStorage.getItem('vh_token'); }
-        function getUser()         { return JSON.parse(localStorage.getItem('vh_user') || 'null'); }
-        function clearAuth()       { localStorage.removeItem('vh_token'); localStorage.removeItem('vh_user'); }
-        function isLoggedIn()      { return !!getToken(); }
-        function redirectIfGuest() { if (!isLoggedIn()) window.location.href = 'index.html'; }
-        function logout()          { clearAuth(); window.location.href = 'index.html'; }
-
-        async function api(path, options = {}) {
-            const token = getToken();
-            const headers = { 'Content-Type': 'application/json', ...options.headers };
-            if (token) headers['Authorization'] = `Bearer ${token}`;
-            const res = await fetch(API_BASE + path, { ...options, headers });
-            const data = await res.json().catch(() => ({}));
-            if (res.status === 401) { clearAuth(); window.location.href = 'index.html'; return; }
-            return { ok: res.ok, status: res.status, data };
-        }
+        // API logic is handled by api.js (ensure api.js is included in the head or before this script)
+        // Add <script src="api.js"></script> to the head if missing.
 
         async function apiDashboard()    { return api('/dashboard/summary'); }
         async function apiGetDonationStats() { return api('/donations/stats'); }
