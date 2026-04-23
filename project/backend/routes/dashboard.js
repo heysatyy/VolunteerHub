@@ -13,7 +13,7 @@ router.get('/summary', protect, async (req, res) => {
     const eventCount  = await db.get("SELECT COUNT(*) AS cnt FROM events WHERE status IN ('upcoming','ongoing')");
     const upcomingEvts = await db.all(
       `SELECT title, event_date, location FROM events 
-       WHERE event_date >= CURRENT_DATE 
+       WHERE event_date >= CURRENT_DATE::text 
        ORDER BY event_date ASC LIMIT 5`
     );
     const recentDons = await db.all(
