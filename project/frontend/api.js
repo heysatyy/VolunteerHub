@@ -1,10 +1,5 @@
-// api.js — Shared API utility for VolunteerHub Frontend
-// All pages include this script to talk to the backend
-
-// Use the deployed backend URL if available, otherwise fallback to localhost
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:5000/api'
-  : 'https://volunteerhub-9crd.onrender.com/api'; // Replace this after hosting on Render
+// Force all traffic to the Production Render Backend
+const API_BASE = 'https://volunteerhub-9crd.onrender.com/api';
 
 
 // ── Token helpers ─────────────────────────────────────────
