@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events | VolunteerHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; overflow-x: hidden; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .noise-overlay { position: fixed; inset: 0; z-index: 50; pointer-events: none; opacity: 0.05; mix-blend-mode: overlay; background-image: url("https://grainy-gradients.vercel.app/noise.svg"); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 200; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        .modal { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 2.5rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s; }
+        .modal-overlay.open .modal { transform: scale(1); }
+        input, select, textarea { width: 100%; padding: 0.75rem 1rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 0.875rem; color: white; background: rgba(255,255,255,0.05); outline: none; transition: border-color 0.2s; }
+        input:focus, select:focus, textarea:focus { border-color: #FF4500; }
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 6px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="selection:bg-[#FF4500] selection:text-white pb-20">
+    <div class="noise-overlay"></div>
+
+    <nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-4 bg-[#050505]/80 backdrop-blur-md border-b border-white/5">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <a href="#" class="text-2xl font-bold tracking-tighter font-serif text-white">VolunteerHub.</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="dashboard.html" class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Dashboard</a>
+                <a href="volunteers.html" class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Volunteers</a>
+                <a href="donations.html" class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Donations</a>
+                <a href="events.html" class="text-sm text-white transition-colors duration-300">Events</a>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-xs font-bold text-[#FF4500]" id="navAvatar">?</div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-medium text-white" id="navName">User</span>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-wider" id="navRole">Role</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="inline-flex items-center justify-center px-6 py-2 rounded-full text-xs font-medium border border-white/20 text-white hover:bg-white hover:text-black transition-all duration-300">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="pt-32 pb-12 relative z-20">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-8">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-serif mb-2 text-white">Operations Calendar</h1>
+                    <p class="text-gray-400 text-sm tracking-wide">Schedule and coordinate field initiatives.</p>
+                </div>
+                <button onclick="openAddModal()" class="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-medium bg-[#FF4500] text-black hover:bg-[#ff571a] transition-all duration-300 gap-2">
+                    <iconify-icon icon="lucide:calendar-plus"></iconify-icon> Initialize Operation
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative z-20">
+        <div class="container mx-auto px-6">
+            <!-- Stat Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="text-gray-500 text-xs font-mono uppercase tracking-widest">Total Ops</span>
+                        <iconify-icon icon="lucide:globe" class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-4xl font-serif mb-2 text-white" id="statTotal">—</h3>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Historical record</p>
+                    </div>
+                </div>
+                <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="text-gray-500 text-xs font-mono uppercase tracking-widest">Pending Deployments</span>
+                        <iconify-icon icon="lucide:clock" class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-4xl font-serif mb-2 text-[#3b82f6]" id="statUpcoming">—</h3>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Scheduled ahead</p>
+                    </div>
+                </div>
+                <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="text-gray-500 text-xs font-mono uppercase tracking-widest">Missions Accomplished</span>
+                        <iconify-icon icon="lucide:check-circle" class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-4xl font-serif mb-2 text-[#40916c]" id="statCompleted">—</h3>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Successfully resolved</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-4 mb-8">
+                <div class="relative flex-1 min-w-[250px] max-w-[400px]">
+                    <iconify-icon icon="lucide:search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></iconify-icon>
+                    <input type="text" id="searchInput" placeholder="Search operations..." class="pl-12 !bg-[#111]" oninput="renderEvents()">
+                </div>
+                <select id="statusFilter" class="w-auto min-w-[150px] !bg-[#111]" onchange="renderEvents()">
+                    <option value="">All Statuses</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+
+            <!-- Grid -->
+            <div id="eventsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="col-span-full text-center py-20 text-gray-500">
+                    <iconify-icon icon="lucide:loader-2" class="text-3xl animate-spin mb-4 text-[#FF4500]"></iconify-icon>
+                    <p>Loading operation coordinates...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal">
+            <h2 class="text-3xl font-serif text-white mb-6">Initialize Operation</h2>
+            <div id="addError" class="hidden bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl mb-6 text-sm"></div>
+            <div id="addSuccess" class="hidden bg-green-500/10 border border-green-500/20 text-green-500 p-4 rounded-xl mb-6 text-sm"></div>
+            
+            <div class="mb-4">
+                <label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Codename / Title *</label>
+                <input type="text" id="evTitle" placeholder="Operation Health-Drop">
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Briefing</label>
+                <textarea id="evDesc" rows="2" placeholder="Mission parameters..."></textarea>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">T-Zero Date *</label><input type="date" id="evDate"></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Coordinates</label><input type="text" id="evLocation" placeholder="Sector 7G"></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Start Time</label><input type="time" id="evStart"></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">End Time</label><input type="time" id="evEnd"></div>
+                <div class="md:col-span-2"><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Personnel Required</label><input type="number" id="evMax" placeholder="50" min="1"></div>
+            </div>
+            
+            <div class="flex justify-end gap-4 mt-8 pt-6 border-t border-white/10">
+                <button onclick="closeAddModal()" class="px-6 py-2 rounded-full text-sm text-gray-400 hover:text-white transition-colors">Abort</button>
+                <button id="addBtn" onclick="handleAddEvent()" class="px-6 py-2 rounded-full text-sm font-medium bg-[#FF4500] text-black hover:bg-[#ff571a] transition-all">Authorize</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Logic -->
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        function getToken()  { return localStorage.getItem('vh_token'); }
+        function getUser()   { return JSON.parse(localStorage.getItem('vh_user') || 'null'); }
+        function clearAuth() { localStorage.removeItem('vh_token'); localStorage.removeItem('vh_user'); }
+        function isLoggedIn(){ return !!getToken(); }
+        function logout()    { clearAuth(); window.location.href = 'index.html'; }
+        function redirectIfGuest() { if (!isLoggedIn()) window.location.href = 'index.html'; }
+
+        async function api(path, options = {}) {
+            const token = getToken();
+            const headers = { 'Content-Type': 'application/json', ...options.headers };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            const res = await fetch(API_BASE + path, { ...options, headers });
+            const data = await res.json().catch(() => ({}));
+            if (res.status === 401 || res.status === 403) { clearAuth(); window.location.href = 'index.html'; return; }
+            return { ok: res.ok, status: res.status, data };
+        }
+        async function apiGetEvents() { return api('/events'); }
+        async function apiAddEvent(payload) { return api('/events', { method:'POST', body:JSON.stringify(payload) }); }
+        async function apiDeleteEvent(id)   { return api('/events/'+id, { method:'DELETE' }); }
+        async function apiUpdateEvent(id, payload) { return api('/events/'+id, { method:'PUT', body:JSON.stringify(payload) }); }
+
+        redirectIfGuest();
+
+        const user = getUser();
+        if (user) {
+            document.getElementById('navAvatar').textContent = user.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+            document.getElementById('navName').textContent = user.name;
+            document.getElementById('navRole').textContent = user.role;
+        }
+
+        let allEvents = [];
+
+        function fmtDate(d) {
+            const dt = new Date(d);
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return { day: dt.getDate(), mon: months[dt.getMonth()], full: dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) };
+        }
+
+        function statusLabel(s) { return { upcoming:'Upcoming', ongoing:'Ongoing', completed:'Completed', cancelled:'Cancelled' }[s] || s; }
+
+        function renderEvents() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+
+            let filtered = allEvents.filter(e => {
+                const matchSearch = !search || e.title.toLowerCase().includes(search) || (e.location||'').toLowerCase().includes(search);
+                const matchStatus = !status || e.status === status;
+                return matchSearch && matchStatus;
+            });
+
+            const grid = document.getElementById('eventsGrid');
+
+            if (filtered.length === 0) {
+                grid.className = "col-span-full text-center py-20 text-gray-500";
+                grid.innerHTML = '<iconify-icon icon="lucide:calendar-off" class="text-4xl mb-4 opacity-50"></iconify-icon><p>No operations align with these parameters.</p>';
+                return;
+            }
+
+            grid.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
+            grid.innerHTML = filtered.map(e => {
+                const d = fmtDate(e.event_date);
+                const isAdmin = user && ['admin','coordinator'].includes(user.role);
+                const statusColor = e.status === 'upcoming' ? 'border-[#3b82f6] text-[#3b82f6]' : e.status === 'ongoing' ? 'border-[#FF4500] text-[#FF4500]' : e.status === 'cancelled' ? 'border-[#e63946] text-[#e63946]' : 'border-[#40916c] text-[#40916c]';
+                
+                return `
+                <div class="bg-[#111] border border-white/5 rounded-3xl overflow-hidden hover:border-[#FF4500]/50 transition-all duration-300 group flex flex-col shadow-2xl hover:shadow-[0_10px_30px_rgba(255,69,0,0.1)]">
+                    <div class="p-6 border-b border-white/5 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-white/5 flex flex-col items-center justify-center border border-white/10 group-hover:border-[#FF4500]/30 transition-colors">
+                                <span class="font-serif text-xl leading-none text-white">${d.day}</span>
+                                <span class="text-[8px] uppercase tracking-widest text-gray-500 mt-1">${d.mon}</span>
+                            </div>
+                            <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-md border ${statusColor}">${statusLabel(e.status)}</span>
+                        </div>
+                    </div>
+                    <div class="p-6 flex-1">
+                        <h3 class="text-xl font-serif text-white mb-2">${e.title}</h3>
+                        <p class="text-sm text-gray-400 mb-6 line-clamp-2 leading-relaxed">${e.description || 'No briefing provided.'}</p>
+                        <div class="space-y-3 font-mono text-xs">
+                            <div class="flex items-center gap-3 text-gray-500"><iconify-icon icon="lucide:map-pin" class="text-lg"></iconify-icon> ${e.location || 'TBD'}</div>
+                            <div class="flex items-center gap-3 text-gray-500"><iconify-icon icon="lucide:users" class="text-lg"></iconify-icon> Max ${e.max_volunteers || 50} pers.</div>
+                            ${e.start_time ? `<div class="flex items-center gap-3 text-gray-500"><iconify-icon icon="lucide:clock" class="text-lg"></iconify-icon> ${e.start_time}${e.end_time?' – '+e.end_time:''}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="p-6 border-t border-white/5 flex items-center justify-between mt-auto bg-white/5">
+                        <span class="text-[10px] uppercase tracking-widest text-[#FF4500] font-bold flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#FF4500]"></span> ${e.assigned_count || 0} DEPLOYED</span>
+                        ${isAdmin ? `
+                        <div class="flex gap-2">
+                            ${e.status === 'upcoming' ? `<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-[#40916c]/30 text-[#40916c] hover:bg-[#40916c]/10 transition-colors" onclick="markComplete(${e.id})" title="Mark Complete"><iconify-icon icon="lucide:check"></iconify-icon></button>` : ''}
+                            <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 transition-colors" onclick="deleteEvent(${e.id}, '${e.title.replace(/'/g,"\\'")}')" title="Delete"><iconify-icon icon="lucide:trash-2"></iconify-icon></button>
+                        </div>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function loadEvents() {
+            document.getElementById('eventsGrid').innerHTML = '<div class="col-span-full text-center py-20 text-gray-500"><iconify-icon icon="lucide:loader-2" class="text-3xl animate-spin mb-4 text-[#FF4500]"></iconify-icon><p>Loading operations...</p></div>';
+            const res = await apiGetEvents();
+
+            if (!res || !res.ok) {
+                document.getElementById('eventsGrid').innerHTML = '<div class="col-span-full text-center py-20 text-red-500"><iconify-icon icon="lucide:alert-triangle" class="text-3xl mb-4"></iconify-icon><p>System Error: Sync failed.</p></div>';
+                return;
+            }
+
+            allEvents = res.data.data || [];
+            document.getElementById('statTotal').textContent     = allEvents.length;
+            document.getElementById('statUpcoming').textContent  = allEvents.filter(e => e.status === 'upcoming').length;
+            document.getElementById('statCompleted').textContent = allEvents.filter(e => e.status === 'completed').length;
+
+            renderEvents();
+        }
+
+        async function markComplete(id) {
+            if (!confirm('Resolve operation parameters to COMPLETED?')) return;
+            const res = await apiUpdateEvent(id, { status: 'completed' });
+            if (res && res.ok) loadEvents(); else alert('Override denied.');
+        }
+
+        async function deleteEvent(id, title) {
+            if (!confirm(`Purge operation "${title}"?`)) return;
+            const res = await apiDeleteEvent(id);
+            if (res && res.ok) loadEvents(); else alert('Override denied.');
+        }
+
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('open');
+            document.getElementById('addError').classList.add('hidden');
+            document.getElementById('addSuccess').classList.add('hidden');
+            document.getElementById('evDate').value = new Date().toISOString().split('T')[0];
+        }
+        function closeAddModal() { document.getElementById('addModal').classList.remove('open'); }
+
+        async function handleAddEvent() {
+            const title        = document.getElementById('evTitle').value.trim();
+            const description  = document.getElementById('evDesc').value.trim();
+            const event_date   = document.getElementById('evDate').value;
+            const location     = document.getElementById('evLocation').value.trim();
+            const start_time   = document.getElementById('evStart').value;
+            const end_time     = document.getElementById('evEnd').value;
+            const max_volunteers = document.getElementById('evMax').value || 50;
+
+            const err = document.getElementById('addError');
+            if (!title || !event_date) {
+                err.textContent = 'Mission designation and T-Zero date are required.';
+                err.classList.remove('hidden'); return;
+            }
+
+            const btn = document.getElementById('addBtn');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Processing...';
+
+            const res = await apiAddEvent({ title, description, event_date, location, start_time, end_time, max_volunteers });
+
+            if (res && res.ok) {
+                const succ = document.getElementById('addSuccess');
+                succ.textContent = 'Operation authorized.';
+                succ.classList.remove('hidden'); err.classList.add('hidden');
+                setTimeout(() => { closeAddModal(); loadEvents(); }, 1000);
+            } else {
+                err.textContent = res?.data?.message || 'Authorization failed.';
+                err.classList.remove('hidden');
+            }
+
+            btn.disabled = false; btn.innerHTML = 'Authorize';
+        }
+
+        loadEvents();
+    </script>
+</body>
+</html>

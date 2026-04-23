@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donations | VolunteerHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; overflow-x: hidden; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .noise-overlay { position: fixed; inset: 0; z-index: 50; pointer-events: none; opacity: 0.05; mix-blend-mode: overlay; background-image: url("https://grainy-gradients.vercel.app/noise.svg"); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 1rem; color: rgba(255,255,255,0.5); font-weight: 500; font-size: 0.875rem; }
+        td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 1rem; color: rgba(255,255,255,0.9); font-size: 0.875rem; vertical-align: middle; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 200; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        .modal { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 2.5rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s; }
+        .modal-overlay.open .modal { transform: scale(1); }
+        input, select, textarea { width: 100%; padding: 0.75rem 1rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 0.875rem; color: white; background: rgba(255,255,255,0.05); outline: none; transition: border-color 0.2s; }
+        input:focus, select:focus, textarea:focus { border-color: #FF4500; }
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 6px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="selection:bg-[#FF4500] selection:text-white pb-20">
+    <div class="noise-overlay"></div>
+
+    <nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-4 bg-[#050505]/80 backdrop-blur-md border-b border-white/5">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <a href="#" class="text-2xl font-bold tracking-tighter font-serif text-white">VolunteerHub.</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="dashboard.html" class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Dashboard</a>
+                <a href="volunteers.html" class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Volunteers</a>
+                <a href="donations.html" class="text-sm text-white transition-colors duration-300">Donations</a>
+                <a href="events.html" class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Events</a>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-xs font-bold text-[#FF4500]" id="navAvatar">?</div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-medium text-white" id="navName">User</span>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-wider" id="navRole">Role</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="inline-flex items-center justify-center px-6 py-2 rounded-full text-xs font-medium border border-white/20 text-white hover:bg-white hover:text-black transition-all duration-300">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="pt-32 pb-12 relative z-20">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-8">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-serif mb-2 text-white">Financial Inflow</h1>
+                    <p class="text-gray-400 text-sm tracking-wide">Track resource accumulation and allocation.</p>
+                </div>
+                <button onclick="document.getElementById('donModal').classList.add('open')" class="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-medium bg-[#FF4500] text-black hover:bg-[#ff571a] transition-all duration-300 gap-2">
+                    <iconify-icon icon="lucide:banknote"></iconify-icon> Log Transaction
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative z-20">
+        <div class="container mx-auto px-6">
+            <!-- Stat Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="text-gray-500 text-xs font-mono uppercase tracking-widest">Liquid Assets</span>
+                        <iconify-icon icon="lucide:coins" class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-serif mb-2 text-[#40916c]" id="statTotal">—</h3>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest" id="statTotalSub">Total volume</p>
+                    </div>
+                </div>
+                <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="text-gray-500 text-xs font-mono uppercase tracking-widest">Records</span>
+                        <iconify-icon icon="lucide:file-text" class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-serif mb-2 text-white" id="statCount">—</h3>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Archived transactions</p>
+                    </div>
+                </div>
+                <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="text-gray-500 text-xs font-mono uppercase tracking-widest">Pending</span>
+                        <iconify-icon icon="lucide:hourglass" class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-serif mb-2 text-[#f4a261]" id="statPending">—</h3>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Awaiting verification</p>
+                    </div>
+                </div>
+                <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="text-gray-500 text-xs font-mono uppercase tracking-widest">Primary Vector</span>
+                        <iconify-icon icon="lucide:trending-up" class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-serif mb-2 text-white" id="statTopCat">—</h3>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest" id="statTopCatAmt">Category</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="lg:col-span-2 bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8">
+                    <h2 class="text-xl font-serif mb-6">Inflow Trajectory</h2>
+                    <div class="w-full h-[250px]"><canvas id="trendChart"></canvas></div>
+                </div>
+                <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8">
+                    <h2 class="text-xl font-serif mb-6">Capital Sectors</h2>
+                    <div id="categoryBars" class="space-y-4">
+                        <div class="text-center py-10 text-gray-500">Processing...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Utilization -->
+            <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 mb-8 relative overflow-hidden">
+                <div class="flex justify-between items-center mb-8 relative z-10">
+                    <h2 class="text-xl font-serif text-white">Utilization Matrix</h2>
+                    <button id="addAllocBtn" onclick="document.getElementById('allocModal').classList.add('open')" class="text-xs px-4 py-2 border border-white/20 rounded-full hover:bg-white hover:text-black transition-colors">Allocate Funds</button>
+                </div>
+                <div class="grid grid-cols-3 gap-4 mb-8 relative z-10">
+                    <div class="bg-white/5 rounded-2xl p-4 text-center">
+                        <span class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Acquired</span>
+                        <span class="text-xl font-serif text-[#40916c]" id="fuDonated">—</span>
+                    </div>
+                    <div class="bg-white/5 rounded-2xl p-4 text-center">
+                        <span class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Deployed</span>
+                        <span class="text-xl font-serif text-[#FF4500]" id="fuSpent">—</span>
+                    </div>
+                    <div class="bg-white/5 rounded-2xl p-4 text-center">
+                        <span class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Reserves</span>
+                        <span class="text-xl font-serif text-white" id="fuRemaining">—</span>
+                    </div>
+                </div>
+                <div id="fuCategoryBars" class="space-y-4 relative z-10">
+                    <div class="text-center py-4 text-gray-500">Processing...</div>
+                </div>
+                <div class="absolute -right-20 -bottom-20 opacity-[0.03] pointer-events-none">
+                    <iconify-icon icon="lucide:pie-chart" class="text-[300px]"></iconify-icon>
+                </div>
+            </div>
+
+            <!-- Double Tables -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-[#111] border border-white/5 rounded-3xl overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-white/5">
+                        <h2 class="text-xl font-serif">Recent Operations</h2>
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            <input type="text" id="donSearch" placeholder="Search..." class="!bg-black/30 !py-1.5 !px-3 text-sm flex-1 min-w-[120px]" oninput="handleDonSearch()">
+                            <select id="donStatus" onchange="loadDonations()" class="!bg-black/30 !py-1.5 !px-3 text-sm w-auto"><option value="">All Status</option><option value="confirmed">Confirmed</option><option value="pending">Pending</option><option value="failed">Failed</option></select>
+                            <select id="donMethod" onchange="loadDonations()" class="!bg-black/30 !py-1.5 !px-3 text-sm w-auto"><option value="">All Methods</option><option value="upi">UPI</option><option value="cash">Cash</option><option value="cheque">Cheque</option><option value="net_banking">Net Banking</option></select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full">
+                            <thead><tr><th>ID</th><th>Entity</th><th>Capital</th><th>Vector</th><th>Status</th></tr></thead>
+                            <tbody id="donTableWrap"><tr><td colspan="5" class="text-center py-10">Processing...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-[#111] border border-white/5 rounded-3xl overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-white/5">
+                        <h2 class="text-xl font-serif">Allocation Log</h2>
+                    </div>
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full">
+                            <thead><tr><th>Sector</th><th>Parameters</th><th>Capital</th><th>Date</th></tr></thead>
+                            <tbody id="allocTable"><tr><td colspan="4" class="text-center py-10">Processing...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="donModal">
+        <div class="modal">
+            <h2 class="text-3xl font-serif text-white mb-6">Log Inflow</h2>
+            <div id="donError" class="hidden bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl mb-6 text-sm"></div>
+            <div id="donSuccess" class="hidden bg-green-500/10 border border-green-500/20 text-green-500 p-4 rounded-xl mb-6 text-sm"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Source Entity</label><input type="text" id="dDonorName" placeholder="Entity Name"></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Capital (₹) *</label><input type="number" id="dAmount" placeholder="0.00" min="1"></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Transfer Vector *</label><select id="dMethod"><option value="upi">UPI</option><option value="cash">Cash</option><option value="cheque">Cheque</option><option value="net_banking">Net Banking</option><option value="card">Card</option></select></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Designation</label><select id="dCategory"><option value="medical">Medical</option><option value="education">Education</option><option value="food">Food</option><option value="environment">Environment</option><option value="general">General</option></select></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Txn Hash</label><input type="text" id="dTxn" placeholder="TXN-XXXX"></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Comms (Email)</label><input type="email" id="dEmail" placeholder="entity@net.com"></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Comms (Tel)</label><input type="tel" id="dPhone" placeholder="+1 000 000 0000"></div>
+            </div>
+            
+            <div class="flex justify-end gap-4 mt-8 pt-6 border-t border-white/10">
+                <button onclick="document.getElementById('donModal').classList.remove('open')" class="px-6 py-2 rounded-full text-sm text-gray-400 hover:text-white transition-colors">Abort</button>
+                <button id="donBtn" onclick="handleAddDonation()" class="px-6 py-2 rounded-full text-sm font-medium bg-[#FF4500] text-black hover:bg-[#ff571a] transition-all">Execute Log</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="allocModal">
+        <div class="modal">
+            <h2 class="text-3xl font-serif text-white mb-6">Deploy Capital</h2>
+            <div id="allocError" class="hidden bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl mb-6 text-sm"></div>
+            <div id="allocSuccess" class="hidden bg-green-500/10 border border-green-500/20 text-green-500 p-4 rounded-xl mb-6 text-sm"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Sector *</label><select id="aCategory"><option value="medical">Medical</option><option value="education">Education</option><option value="food">Food</option><option value="environment">Environment</option><option value="general">General</option></select></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Capital (₹) *</label><input type="number" id="aAmount" placeholder="0.00" min="1"></div>
+                <div class="md:col-span-2"><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Operational Parameters *</label><input type="text" id="aDesc" placeholder="Logistics purchase..."></div>
+            </div>
+            
+            <div class="flex justify-end gap-4 mt-8 pt-6 border-t border-white/10">
+                <button onclick="document.getElementById('allocModal').classList.remove('open')" class="px-6 py-2 rounded-full text-sm text-gray-400 hover:text-white transition-colors">Abort</button>
+                <button id="allocBtn" onclick="handleAddAllocation()" class="px-6 py-2 rounded-full text-sm font-medium bg-[#FF4500] text-black hover:bg-[#ff571a] transition-all">Authorize</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Logic -->
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        function getToken() { return localStorage.getItem('vh_token'); }
+        function getUser() { return JSON.parse(localStorage.getItem('vh_user') || 'null'); }
+        function clearAuth() { localStorage.removeItem('vh_token'); localStorage.removeItem('vh_user'); }
+        function isLoggedIn() { return !!getToken(); }
+        function redirectIfGuest() { if (!isLoggedIn()) window.location.href = 'index.html'; }
+        function logout() { clearAuth(); window.location.href = 'index.html'; }
+
+        async function api(path, options = {}) {
+            const token = getToken();
+            const headers = { 'Content-Type': 'application/json', ...options.headers };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            const res = await fetch(API_BASE + path, { ...options, headers });
+            const data = await res.json().catch(() => ({}));
+            if (res.status === 401) { clearAuth(); window.location.href = 'index.html'; return; }
+            return { ok: res.ok, status: res.status, data };
+        }
+
+        async function apiGetDonations(params = {}) { const q = new URLSearchParams(params).toString(); return api('/donations' + (q ? '?' + q : '')); }
+        async function apiGetDonationStats() { return api('/donations/stats'); }
+        async function apiAddDonation(payload) { return api('/donations', { method: 'POST', body: JSON.stringify(payload) }); }
+        async function apiUpdateDonation(id, payload) { return api('/donations/' + id, { method: 'PUT', body: JSON.stringify(payload) }); }
+        async function apiGetAllocations() { return api('/allocations'); }
+        async function apiGetAllocationSummary() { return api('/allocations/summary'); }
+        async function apiAddAllocation(payload) { return api('/allocations', { method: 'POST', body: JSON.stringify(payload) }); }
+
+        redirectIfGuest();
+        const user = getUser();
+        if (user) {
+            document.getElementById('navAvatar').textContent = user.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+            document.getElementById('navName').textContent = user.name;
+            document.getElementById('navRole').textContent = user.role;
+        }
+
+        let donTimer = null;
+        let trendChart = null;
+
+        function fmtAmt(n) {
+            n = parseFloat(n)||0;
+            if (n>=100000) return '₹'+(n/100000).toFixed(1)+'L';
+            if (n>=1000) return '₹'+(n/1000).toFixed(1)+'K';
+            return '₹'+n.toLocaleString('en-IN');
+        }
+        function badgeClass(s) { return {confirmed:'text-[#40916c]',pending:'text-[#f4a261]',failed:'text-[#e63946]'}[s]||'text-[#3b82f6]'; }
+        function fmtDate(d) { return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+
+        function handleDonSearch() { clearTimeout(donTimer); donTimer = setTimeout(loadDonations, 400); }
+
+        async function loadStats() {
+            const res = await apiGetDonationStats();
+            if (!res || !res.ok) return;
+            const { totalCollected, totalCount, pendingAmount, byMonth, byCategory } = res.data;
+
+            document.getElementById('statTotal').textContent = fmtAmt(totalCollected);
+            document.getElementById('statTotalSub').textContent = `${totalCount} ops logged`;
+            document.getElementById('statCount').textContent = totalCount || 0;
+            document.getElementById('statPending').textContent = fmtAmt(pendingAmount);
+
+            if (byCategory && byCategory.length > 0) {
+                const top = byCategory.reduce((a,b) => parseFloat(a.total)>parseFloat(b.total)?a:b);
+                document.getElementById('statTopCat').textContent = top.category.charAt(0).toUpperCase()+top.category.slice(1);
+                document.getElementById('statTopCatAmt').textContent = fmtAmt(top.total)+' volume';
+            }
+
+            const maxAmt = byCategory ? Math.max(...byCategory.map(c=>parseFloat(c.total)||0),1) : 1;
+            document.getElementById('categoryBars').innerHTML = byCategory && byCategory.length ?
+                byCategory.map(c => `
+                    <div class="flex items-center text-sm py-2">
+                        <span class="w-20 uppercase tracking-widest text-[10px] text-white/70 truncate">${c.category}</span>
+                        <div class="flex-1 px-4">
+                            <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-[#40916c]" style="width:${Math.round((parseFloat(c.total)/maxAmt)*100)}%"></div></div>
+                        </div>
+                        <span class="text-[10px] text-[#40916c] w-12 text-right">${fmtAmt(c.total)}</span>
+                    </div>`).join('') : '<div class="text-xs text-gray-500">No telemetry.</div>';
+
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const labels = (byMonth||[]).map(m => months[m.month-1]);
+            const vals   = (byMonth||[]).map(m => parseFloat(m.total)||0);
+            
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            Chart.defaults.color = 'rgba(255,255,255,0.5)';
+            Chart.defaults.font.family = 'Inter';
+            if (trendChart) trendChart.destroy();
+            trendChart = new Chart(ctx, {
+                type:'line',
+                data:{
+                    labels: labels.length ? labels : months.slice(0,6),
+                    datasets:[{
+                        label:'Capital (₹)', data: vals.length ? vals : [0,0,0,0,0,0],
+                        fill:true, backgroundColor:'rgba(255,69,0,0.1)', borderColor:'#FF4500', borderWidth:2, tension:0.4, pointBackgroundColor:'#111', pointBorderColor:'#FF4500'
+                    }]
+                },
+                options:{
+                    responsive: true, maintainAspectRatio: false,
+                    plugins:{legend:{display:false}},
+                    scales:{
+                        y:{beginAtZero:true, grid:{color:'rgba(255,255,255,0.05)'}},
+                        x:{grid:{display:false}}
+                    }
+                }
+            });
+        }
+
+        async function loadDonations() {
+            const search = document.getElementById('donSearch').value.trim();
+            const status = document.getElementById('donStatus').value;
+            const method = document.getElementById('donMethod').value;
+            const params = { limit:20, ...(search&&{search}), ...(status&&{status}), ...(method&&{payment_method:method}) };
+
+            document.getElementById('donTableWrap').innerHTML = '<tr><td colspan="5" class="text-center py-10 text-gray-500">Processing...</td></tr>';
+            const res = await apiGetDonations(params);
+
+            if (!res || !res.ok) {
+                document.getElementById('donTableWrap').innerHTML = '<tr><td colspan="5" class="text-center py-10 text-red-500">System failure.</td></tr>';
+                return;
+            }
+            const { data } = res.data;
+            if (!data || data.length === 0) {
+                document.getElementById('donTableWrap').innerHTML = '<tr><td colspan="5" class="text-center py-10 text-gray-500">No records found.</td></tr>';
+                return;
+            }
+
+            document.getElementById('donTableWrap').innerHTML = data.map(d => `
+                <tr>
+                    <td class="font-mono text-[10px] text-gray-500 uppercase">${d.receipt_number||'—'}</td>
+                    <td class="text-white">${d.donor_name||'Anonymous'}</td>
+                    <td class="font-serif text-[#40916c] text-lg">${fmtAmt(d.amount)}</td>
+                    <td class="text-[10px] tracking-widest uppercase text-gray-400">${d.category||'—'} <span class="opacity-50">(${d.payment_method||'—'})</span></td>
+                    <td class="text-[10px] font-bold uppercase tracking-widest ${badgeClass(d.status)}">
+                        ${d.status}
+                        ${user && ['admin', 'coordinator'].includes(user.role) && d.status==='pending' ? `<button class="ml-2 px-2 py-0.5 border border-green-500/30 rounded hover:bg-green-500/10 transition-colors" onclick="confirmDon(${d.id})">Confirm</button>` : ''}
+                    </td>
+                </tr>`).join('');
+        }
+
+        async function confirmDon(id) {
+            const res = await apiUpdateDonation(id, { status:'confirmed' });
+            if (res && res.ok) { loadDonations(); loadStats(); }
+            else alert('Override denied. Elevate privileges.');
+        }
+
+        async function handleAddDonation() {
+            const amount = document.getElementById('dAmount').value;
+            const payment_method = document.getElementById('dMethod').value;
+            const category = document.getElementById('dCategory').value;
+            const transaction_id = document.getElementById('dTxn').value.trim();
+            const donor_name = document.getElementById('dDonorName').value.trim();
+            const donor_email = document.getElementById('dEmail').value.trim();
+            const donor_phone = document.getElementById('dPhone').value.trim();
+
+            const err = document.getElementById('donError');
+            if (!amount) {
+                err.textContent = 'Capital amount required.'; err.classList.remove('hidden'); return;
+            }
+            const btn = document.getElementById('donBtn');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Processing...';
+
+            const res = await apiAddDonation({ amount, payment_method, category, transaction_id, donor_name, donor_email, donor_phone, status:'confirmed' });
+            if (res && res.ok) {
+                const succ = document.getElementById('donSuccess');
+                succ.textContent = `Log successful. HASH: ${res.data.receiptNumber}`;
+                succ.classList.remove('hidden'); err.classList.add('hidden');
+                setTimeout(() => { document.getElementById('donModal').classList.remove('open'); loadDonations(); loadStats(); }, 1200);
+            } else {
+                err.textContent = res?.data?.message || 'Transaction failed.'; err.classList.remove('hidden');
+            }
+            btn.disabled = false; btn.innerHTML = 'Execute Log';
+        }
+
+        loadStats(); loadDonations(); loadFundUtil(); loadAllocations();
+
+        if (user && !['admin','coordinator'].includes(user.role)) {
+            const ab = document.getElementById('addAllocBtn');
+            if (ab) ab.style.display = 'none';
+        }
+
+        async function loadFundUtil() {
+            const res = await apiGetAllocationSummary();
+            if (!res || !res.ok) return;
+            const { totalDonated, totalSpent, remaining, byCategory } = res.data;
+            document.getElementById('fuDonated').textContent = fmtAmt(totalDonated);
+            document.getElementById('fuSpent').textContent = fmtAmt(totalSpent);
+            document.getElementById('fuRemaining').textContent = fmtAmt(remaining);
+
+            if (byCategory && byCategory.length > 0) {
+                const maxVal = Math.max(...byCategory.map(c => parseFloat(c.total_spent)||0), 1);
+                document.getElementById('fuCategoryBars').innerHTML = byCategory.map(c => `
+                    <div class="flex items-center text-sm py-2">
+                        <span class="w-24 uppercase tracking-widest text-[10px] text-white/70 truncate">${c.category}</span>
+                        <div class="flex-1 px-4">
+                            <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-[#FF4500]" style="width:${Math.round((parseFloat(c.total_spent)/maxVal)*100)}%"></div></div>
+                        </div>
+                        <span class="text-[10px] text-[#FF4500] w-12 text-right">${fmtAmt(c.total_spent)}</span>
+                    </div>`).join('');
+            } else {
+                document.getElementById('fuCategoryBars').innerHTML = '<div class="text-xs text-gray-500">No utilization data.</div>';
+            }
+        }
+
+        async function loadAllocations() {
+            const res = await apiGetAllocations();
+            if (!res || !res.ok) return;
+            const data = res.data.data || [];
+            const el = document.getElementById('allocTable');
+            if (data.length === 0) {
+                el.innerHTML = '<tr><td colspan="4" class="text-center py-10 text-gray-500">No allocations logged.</td></tr>'; return;
+            }
+            el.innerHTML = data.map(a => `
+                <tr>
+                    <td class="text-[10px] uppercase tracking-widest text-gray-400">${a.category}</td>
+                    <td class="text-gray-300 text-sm truncate max-w-[150px]">${a.description}</td>
+                    <td class="font-serif text-[#FF4500]">${fmtAmt(a.amount)}</td>
+                    <td class="text-[10px] text-gray-500 uppercase tracking-widest">${fmtDate(a.allocated_at)}</td>
+                </tr>`).join('');
+        }
+
+        async function handleAddAllocation() {
+            const category = document.getElementById('aCategory').value;
+            const amount = document.getElementById('aAmount').value;
+            const description = document.getElementById('aDesc').value.trim();
+            const err = document.getElementById('allocError');
+
+            if (!amount || !description) {
+                err.textContent = 'Missing parameters.'; err.classList.remove('hidden'); return;
+            }
+            const btn = document.getElementById('allocBtn');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Processing...';
+
+            const res = await apiAddAllocation({ category, amount, description });
+            if (res && res.ok) {
+                const succ = document.getElementById('allocSuccess');
+                succ.textContent = 'Deployment authorized.'; succ.classList.remove('hidden'); err.classList.add('hidden');
+                setTimeout(() => { document.getElementById('allocModal').classList.remove('open'); loadFundUtil(); loadAllocations(); loadStats(); }, 1000);
+            } else {
+                err.textContent = res?.data?.message || 'Override denied.'; err.classList.remove('hidden');
+            }
+            btn.disabled = false; btn.innerHTML = 'Authorize';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteers | VolunteerHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; overflow-x: hidden; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .noise-overlay { position: fixed; inset: 0; z-index: 50; pointer-events: none; opacity: 0.05; mix-blend-mode: overlay; background-image: url("https://grainy-gradients.vercel.app/noise.svg"); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 1rem; color: rgba(255,255,255,0.5); font-weight: 500; font-size: 0.875rem; }
+        td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 1rem; color: rgba(255,255,255,0.9); font-size: 0.875rem; vertical-align: middle; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 200; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        .modal { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 2.5rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s; }
+        .modal-overlay.open .modal { transform: scale(1); }
+        input, select, textarea { width: 100%; padding: 0.75rem 1rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 0.875rem; color: white; background: rgba(255,255,255,0.05); outline: none; transition: border-color 0.2s; }
+        input:focus, select:focus, textarea:focus { border-color: #FF4500; }
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 6px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="selection:bg-[#FF4500] selection:text-white pb-20">
+    <div class="noise-overlay"></div>
+
+    <nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-4 bg-[#050505]/80 backdrop-blur-md border-b border-white/5">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <a href="#" class="text-2xl font-bold tracking-tighter font-serif text-white">VolunteerHub.</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="dashboard.html" class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Dashboard</a>
+                <a href="volunteers.html" class="text-sm text-white transition-colors duration-300">Volunteers</a>
+                <a href="donations.html" class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Donations</a>
+                <a href="events.html" class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Events</a>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-xs font-bold text-[#FF4500]" id="navAvatar">?</div>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-medium text-white" id="navName">User</span>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-wider" id="navRole">Role</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="inline-flex items-center justify-center px-6 py-2 rounded-full text-xs font-medium border border-white/20 text-white hover:bg-white hover:text-black transition-all duration-300">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="pt-32 pb-12 relative z-20">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-8">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-serif mb-2 text-white">Workforce Management</h1>
+                    <p class="text-gray-400 text-sm tracking-wide">Monitor, dispatch, and assess human capital.</p>
+                </div>
+                <button onclick="openAddModal()" class="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-medium bg-[#FF4500] text-black hover:bg-[#ff571a] transition-all duration-300 gap-2">
+                    <iconify-icon icon="lucide:user-plus"></iconify-icon> Add Personnel
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative z-20">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-wrap gap-4 mb-8">
+                <div class="relative flex-1 min-w-[250px] max-w-[400px]">
+                    <iconify-icon icon="lucide:search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></iconify-icon>
+                    <input type="text" id="searchInput" placeholder="Search by name or email..." class="pl-12 !bg-[#111]" oninput="handleSearch()">
+                </div>
+                <select id="statusFilter" class="w-auto min-w-[150px] !bg-[#111]" onchange="handleSearch()">
+                    <option value="">All Status</option><option value="active">Active</option><option value="pending">Pending</option><option value="inactive">Inactive</option><option value="on_leave">On Leave</option>
+                </select>
+                <select id="skillsFilter" class="w-auto min-w-[150px] !bg-[#111]" onchange="handleSearch()">
+                    <option value="">All Skills</option><option value="Medical">Medical</option><option value="Teaching">Teaching</option><option value="Logistics">Logistics</option><option value="Tech">Tech</option>
+                </select>
+            </div>
+
+            <div class="bg-[#111] border border-white/10 rounded-3xl overflow-hidden">
+                <div id="tableBody">
+                    <div class="text-center py-20 text-gray-500">
+                        <iconify-icon icon="lucide:loader-2" class="text-3xl animate-spin mb-4 text-[#FF4500]"></iconify-icon>
+                        <p>Initializing workforce data...</p>
+                    </div>
+                </div>
+                <div class="px-8 py-4 border-t border-white/5 flex items-center justify-between text-sm text-gray-500">
+                    <span id="pageInfo">—</span>
+                    <div class="flex gap-2" id="pageBtns"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal">
+            <h2 class="text-3xl font-serif text-white mb-6">Enlist Personnel</h2>
+            <div id="addError" class="hidden bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl mb-6 text-sm"></div>
+            <div id="addSuccess" class="hidden bg-green-500/10 border border-green-500/20 text-green-500 p-4 rounded-xl mb-6 text-sm"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Full Name *</label><input type="text" id="addName" placeholder="Operator Name"></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Email *</label><input type="email" id="addEmail" placeholder="op@system.com"></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Phone</label><input type="tel" id="addPhone" placeholder="+1 000 000 0000"></div>
+                <div><label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Password *</label><input type="password" id="addPassword" placeholder="••••••••"></div>
+                <div>
+                    <label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Specialization</label>
+                    <select id="addSkills"><option value="Medical">Medical</option><option value="Teaching">Teaching</option><option value="Logistics">Logistics</option><option value="Tech">Tech</option><option value="Other">Other</option></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-mono uppercase tracking-widest text-gray-500 mb-2">Deployment Avail.</label>
+                    <select id="addAvail"><option value="weekends">Weekends</option><option value="weekdays">Weekdays</option><option value="fulltime">Full-time</option><option value="flexible">Flexible</option></select>
+                </div>
+            </div>
+            
+            <div class="flex justify-end gap-4 mt-8 pt-6 border-t border-white/10">
+                <button onclick="closeAddModal()" class="px-6 py-2 rounded-full text-sm text-gray-400 hover:text-white transition-colors">Abort</button>
+                <button id="addBtn" onclick="handleAddVolunteer()" class="px-6 py-2 rounded-full text-sm font-medium bg-[#FF4500] text-black hover:bg-[#ff571a] transition-all">Enlist</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Logic -->
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        function getToken() { return localStorage.getItem('vh_token'); }
+        function getUser() { return JSON.parse(localStorage.getItem('vh_user') || 'null'); }
+        function clearAuth() { localStorage.removeItem('vh_token'); localStorage.removeItem('vh_user'); }
+        function isLoggedIn() { return !!getToken(); }
+        function redirectIfGuest() { if (!isLoggedIn()) { window.location.href = 'index.html'; } }
+        function logout() { clearAuth(); window.location.href = 'index.html'; }
+
+        async function api(path, options = {}) {
+            const token = getToken();
+            const headers = { 'Content-Type': 'application/json', ...options.headers };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            const res = await fetch(API_BASE + path, { ...options, headers });
+            const data = await res.json().catch(() => ({}));
+            if (res.status === 401) { clearAuth(); window.location.href = 'index.html'; return; }
+            return { ok: res.ok, status: res.status, data };
+        }
+
+        async function apiGetVolunteers(params = {}) {
+            const q = new URLSearchParams(params).toString();
+            return api('/volunteers' + (q ? '?' + q : ''));
+        }
+        async function apiAddVolunteer(payload) {
+            return api('/auth/register', { method: 'POST', body: JSON.stringify({ ...payload, role: 'volunteer' }) });
+        }
+        async function apiUpdateVolunteer(id, payload) {
+            return api('/volunteers/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+        }
+        async function apiDeleteVolunteer(id) {
+            return api('/volunteers/' + id, { method: 'DELETE' });
+        }
+
+        redirectIfGuest();
+        const user = getUser();
+        if (user) {
+            document.getElementById('navAvatar').textContent = user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            document.getElementById('navName').textContent = user.name;
+            document.getElementById('navRole').textContent = user.role;
+        }
+
+        let currentPage = 1;
+        const limit = 10;
+        let searchTimer = null;
+
+        function badgeStatus(s) {
+            return { active: 'text-[#40916c]', pending: 'text-[#3b82f6]', inactive: 'text-[#e63946]', on_leave: 'text-[#f4a261]' }[s] || 'text-[#3b82f6]';
+        }
+        function labelStatus(s) {
+            return { active: 'Active', pending: 'Pending', inactive: 'Inactive', on_leave: 'On Leave' }[s] || s;
+        }
+        function initials(name) { return (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(); }
+
+        function handleSearch() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => { currentPage = 1; loadVolunteers(); }, 400);
+        }
+
+        async function loadVolunteers() {
+            const search = document.getElementById('searchInput').value.trim();
+            const status = document.getElementById('statusFilter').value;
+            const skills = document.getElementById('skillsFilter').value;
+            const params = { page: currentPage, limit, ...(search && { search }), ...(status && { status }), ...(skills && { skills }) };
+
+            document.getElementById('tableBody').innerHTML = '<div class="text-center py-20 text-gray-500"><iconify-icon icon="lucide:loader-2" class="text-3xl animate-spin mb-4 text-[#FF4500]"></iconify-icon><p>Fetching records...</p></div>';
+            const res = await apiGetVolunteers(params);
+
+            if (!res || !res.ok) {
+                document.getElementById('tableBody').innerHTML = '<div class="text-center py-20 text-red-500"><iconify-icon icon="lucide:alert-triangle" class="text-3xl mb-4"></iconify-icon><p>System Error: Failed to load data.</p></div>';
+                return;
+            }
+
+            const { data, total } = res.data;
+            if (!data || data.length === 0) {
+                document.getElementById('tableBody').innerHTML = '<div class="text-center py-20 text-gray-500"><iconify-icon icon="lucide:users" class="text-4xl mb-4 opacity-50"></iconify-icon><p>No personnel records found.</p></div>';
+                document.getElementById('pageInfo').textContent = '0 records';
+                document.getElementById('pageBtns').innerHTML = '';
+                return;
+            }
+
+            const rows = data.map(v => `
+            <tr>
+                <td>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[10px] font-bold text-[#FF4500]">${initials(v.name)}</div>
+                        <div>
+                            <div class="font-medium text-white">${v.name}</div>
+                            <div class="text-[10px] text-gray-500">${v.email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-gray-400 text-sm">${v.phone || '—'}</td>
+                <td class="text-gray-400 uppercase text-[10px] tracking-widest">${v.skills || '—'}</td>
+                <td class="font-serif text-lg text-white">${v.total_hours || 0}h</td>
+                <td class="uppercase text-[10px] tracking-widest font-bold ${badgeStatus(v.status)}">${labelStatus(v.status)}</td>
+                <td>
+                ${user && ['admin', 'coordinator'].includes(user.role) ? `
+                    <div class="flex gap-2">
+                    ${v.status === 'pending' ? `<button class="px-3 py-1 rounded border border-green-500/30 text-green-500 hover:bg-green-500/10 text-xs transition-colors" onclick="acceptVolunteer(${v.id})">Accept</button>` : ''}
+                    <button class="px-3 py-1 rounded border border-white/10 text-gray-400 hover:text-white hover:border-white/30 text-xs transition-colors" onclick="changeStatus(${v.id}, '${v.status}')">Status</button>
+                    <button class="px-3 py-1 rounded border border-red-500/30 text-red-500 hover:bg-red-500/10 text-xs transition-colors" onclick="deleteVolunteer(${v.id}, '${v.name.replace(/'/g,"\\'")}')">Delete</button>
+                    </div>
+                ` : '<span class="text-gray-600 text-xs">—</span>'}
+                </td>
+            </tr>`).join('');
+
+            document.getElementById('tableBody').innerHTML = `
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                <thead><tr><th>Personnel</th><th>Comms</th><th>Spec</th><th>Time</th><th>Status</th><th>Override</th></tr></thead>
+                <tbody>${rows}</tbody>
+                </table>
+            </div>`;
+
+            const totalPages = Math.ceil(total / limit);
+            document.getElementById('pageInfo').textContent = `Showing ${data.length} of ${total} personnel`;
+            const pgBtns = document.getElementById('pageBtns');
+            pgBtns.innerHTML = '';
+            for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+                pgBtns.innerHTML += `<button class="w-8 h-8 flex items-center justify-center rounded-lg border ${i === currentPage ? 'border-[#FF4500] text-[#FF4500]' : 'border-white/10 text-gray-400 hover:border-white/30 hover:text-white'} text-sm transition-colors" onclick="gotoPage(${i})">${i}</button>`;
+            }
+        }
+
+        function gotoPage(p) { currentPage = p; loadVolunteers(); }
+
+        async function changeStatus(id, current) {
+            const statuses = ['active', 'pending', 'inactive', 'on_leave'];
+            const next = statuses[(statuses.indexOf(current) + 1) % statuses.length];
+            if (!confirm(`Update classification to "${next}"?`)) return;
+            const res = await apiUpdateVolunteer(id, { status: next });
+            if (res && res.ok) loadVolunteers();
+            else alert('Override denied. Elevate privileges.');
+        }
+
+        async function acceptVolunteer(id) {
+            const res = await apiUpdateVolunteer(id, { status: 'active' });
+            if (res && res.ok) loadVolunteers();
+            else alert('Override denied. Elevate privileges.');
+        }
+
+        async function deleteVolunteer(id, name) {
+            if (!confirm(`Purge personnel record "${name}"? This is irreversible.`)) return;
+            const res = await apiDeleteVolunteer(id);
+            if (res && res.ok) loadVolunteers();
+            else alert('Override denied. Elevate privileges.');
+        }
+
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('open');
+            document.getElementById('addError').classList.add('hidden');
+            document.getElementById('addSuccess').classList.add('hidden');
+        }
+        function closeAddModal() { document.getElementById('addModal').classList.remove('open'); }
+
+        async function handleAddVolunteer() {
+            const name = document.getElementById('addName').value.trim();
+            const email = document.getElementById('addEmail').value.trim();
+            const phone = document.getElementById('addPhone').value.trim();
+            const password = document.getElementById('addPassword').value;
+            const skills = document.getElementById('addSkills').value;
+            const availability = document.getElementById('addAvail').value;
+
+            const err = document.getElementById('addError');
+            if (!name || !email || !password) {
+                err.textContent = 'Missing required operational parameters.';
+                err.classList.remove('hidden');
+                return;
+            }
+
+            const btn = document.getElementById('addBtn');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Processing...';
+
+            const res = await apiAddVolunteer({ name, email, phone, password, skills, availability });
+            if (res && res.ok) {
+                const succ = document.getElementById('addSuccess');
+                succ.textContent = 'Enlistment successful.';
+                succ.classList.remove('hidden');
+                err.classList.add('hidden');
+                setTimeout(() => { closeAddModal(); loadVolunteers(); }, 1200);
+            } else {
+                err.textContent = res?.data?.message || 'System failure during enlistment.';
+                err.classList.remove('hidden');
+            }
+            btn.disabled = false; btn.innerHTML = 'Enlist';
+        }
+
+        loadVolunteers();
+    </script>
+</body>
+</html>
