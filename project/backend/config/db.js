@@ -164,7 +164,7 @@ async function createTables() {
 
 async function seedData() {
   const userCount = await get('SELECT COUNT(*) as count FROM users');
-  if (parseInt(userCount.count) > 0) return; // Already seeded
+  if (!userCount || parseInt(userCount.count) > 0) return; // Already seeded
 
   console.log('🌱 Seeding initial data...');
   const bcrypt = require('bcryptjs');
