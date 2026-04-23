@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg: #050505;
@@ -51,13 +54,33 @@
             mix-blend-mode: overlay;
             background-image: url("https://grainy-gradients.vercel.app/noise.svg");
         }
-        
+
         /* Custom Table Styles for Dark Theme */
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 1rem; color: rgba(255,255,255,0.5); font-weight: 500; font-size: 0.875rem; }
-        td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 1rem; color: rgba(255,255,255,0.9); font-size: 0.875rem; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
-        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        td {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.875rem;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
         .skeleton {
             background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%);
             background-size: 200% 100%;
@@ -66,16 +89,44 @@
             height: 1.5rem;
             width: 100%;
         }
-        @keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
-        
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
         /* Fund Bars */
-        .util-bar-wrap { background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden; flex: 1; margin: 0 1rem; }
-        .util-bar { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
-        .util-bar.donated { background: #40916c; }
-        .util-bar.spent { background: var(--accent); }
+        .util-bar-wrap {
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            flex: 1;
+            margin: 0 1rem;
+        }
+
+        .util-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+
+        .util-bar.donated {
+            background: #40916c;
+        }
+
+        .util-bar.spent {
+            background: var(--accent);
+        }
     </style>
     <script src="api.js"></script>
 </head>
+
 <body>
     <div class="min-h-screen bg-[#050505] selection:bg-[#FF4500] selection:text-white pb-20">
         <!-- Global Noise Overlay -->
@@ -87,23 +138,28 @@
                 <a href="#" class="text-2xl font-bold tracking-tighter font-serif text-white">
                     VolunteerHub.
                 </a>
-                
+
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="dashboard.html" class="text-sm text-white transition-colors duration-300">Dashboard</a>
-                    <a href="volunteers.html" class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Volunteers</a>
-                    <a href="donations.html" class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Donations</a>
-                    <a href="events.html" class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Events</a>
+                    <a href="volunteers.html"
+                        class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Volunteers</a>
+                    <a href="donations.html"
+                        class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Donations</a>
+                    <a href="events.html"
+                        class="text-sm text-gray-400 hover:text-white transition-colors duration-300">Events</a>
                 </div>
 
                 <div class="flex items-center gap-6">
                     <div class="hidden md:flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-xs font-bold text-[#FF4500]" id="navAvatar">?</div>
+                        <div class="w-8 h-8 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-xs font-bold text-[#FF4500]"
+                            id="navAvatar">?</div>
                         <div class="flex flex-col">
                             <span class="text-xs font-medium text-white" id="navName">User</span>
                             <span class="text-[10px] text-gray-500 uppercase tracking-wider" id="navRole">Role</span>
                         </div>
                     </div>
-                    <button onclick="logout()" class="inline-flex items-center justify-center px-6 py-2 rounded-full text-xs font-medium border border-white/20 text-white hover:bg-white hover:text-black transition-all duration-300">
+                    <button onclick="logout()"
+                        class="inline-flex items-center justify-center px-6 py-2 rounded-full text-xs font-medium border border-white/20 text-white hover:bg-white hover:text-black transition-all duration-300">
                         Logout
                     </button>
                 </div>
@@ -115,31 +171,37 @@
             <!-- Background Atmosphere -->
             <div class="absolute inset-0 z-0 pointer-events-none select-none">
                 <div class="absolute top-0 left-0 w-full h-[600px] opacity-30 mix-blend-screen">
-                    <img src="https://framerusercontent.com/images/9zvwRJAavKKacVyhFCwHyXW1U.png?width=1536&height=1024" alt="Atmosphere" class="w-full h-full object-cover object-center">
+                    <img src="https://framerusercontent.com/images/9zvwRJAavKKacVyhFCwHyXW1U.png?width=1536&height=1024"
+                        alt="Atmosphere" class="w-full h-full object-cover object-center">
                 </div>
-                <div class="absolute inset-0 bg-gradient-to-b from-[#050505]/50 via-transparent to-[#050505] z-10"></div>
+                <div class="absolute inset-0 bg-gradient-to-b from-[#050505]/50 via-transparent to-[#050505] z-10">
+                </div>
             </div>
 
             <!-- Hero Content -->
             <div class="container mx-auto px-6 relative z-20 text-center flex flex-col items-center justify-center">
                 <div class="reveal">
-                    <h1 class="text-4xl md:text-6xl font-medium leading-[1.1] tracking-tight mb-4 text-[#ffe0e0] mix-blend-overlay font-serif" style="text-shadow: 0 0 12px rgba(255,255,255,0.5);">
+                    <h1 class="text-4xl md:text-6xl font-medium leading-[1.1] tracking-tight mb-4 text-[#ffe0e0] mix-blend-overlay font-serif"
+                        style="text-shadow: 0 0 12px rgba(255,255,255,0.5);">
                         <span id="greetMsg">Welcome</span> <br />
                         <span class="italic font-light text-[#FF4500]" id="heroName">System Operator</span>
                     </h1>
                 </div>
-                
+
                 <div class="reveal" style="transition-delay: 200ms;">
-                    <p class="text-sm md:text-base text-gray-400 max-w-lg mx-auto font-light tracking-wide leading-relaxed">
+                    <p
+                        class="text-sm md:text-base text-gray-400 max-w-lg mx-auto font-light tracking-wide leading-relaxed">
                         Your central command for operations, human capital, and resource allocation.
                     </p>
                 </div>
 
                 <div class="reveal flex flex-col items-center gap-6 mt-12" style="transition-delay: 400ms;">
-                    <div class="flex items-center gap-4 text-[10px] md:text-xs text-white/40 uppercase tracking-widest font-mono">
+                    <div
+                        class="flex items-center gap-4 text-[10px] md:text-xs text-white/40 uppercase tracking-widest font-mono">
                         <span id="current-time">11:11 PM</span>
                         <span class="w-px h-3 bg-white/20"></span>
-                        <span class="text-green-500 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> SYSTEM ONLINE</span>
+                        <span class="text-green-500 flex items-center gap-2"><span
+                                class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> SYSTEM ONLINE</span>
                     </div>
                 </div>
             </div>
@@ -150,32 +212,38 @@
             <div class="container mx-auto px-6">
                 <!-- Stat Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 reveal">
-                    <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
+                    <div
+                        class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
                         <div class="flex justify-between items-start mb-6">
                             <span class="text-gray-500 text-xs font-mono uppercase tracking-widest">Volunteers</span>
-                            <iconify-icon icon="lucide:users" class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
+                            <iconify-icon icon="lucide:users"
+                                class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
                         </div>
                         <div>
                             <h3 class="text-4xl font-serif mb-2" id="statVol">—</h3>
                             <p class="text-xs text-gray-500" id="statVolSub">Active personnel</p>
                         </div>
                     </div>
-                    
-                    <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
+
+                    <div
+                        class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
                         <div class="flex justify-between items-start mb-6">
                             <span class="text-gray-500 text-xs font-mono uppercase tracking-widest">Donations</span>
-                            <iconify-icon icon="lucide:coins" class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
+                            <iconify-icon icon="lucide:coins"
+                                class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
                         </div>
                         <div>
                             <h3 class="text-4xl font-serif mb-2 text-[#40916c]" id="statDon">—</h3>
                             <p class="text-xs text-gray-500" id="statDonSub">Total contributions</p>
                         </div>
                     </div>
-                    
-                    <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
+
+                    <div
+                        class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
                         <div class="flex justify-between items-start mb-6">
                             <span class="text-gray-500 text-xs font-mono uppercase tracking-widest">Events</span>
-                            <iconify-icon icon="lucide:calendar" class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
+                            <iconify-icon icon="lucide:calendar"
+                                class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
                         </div>
                         <div>
                             <h3 class="text-4xl font-serif mb-2" id="statEvt">—</h3>
@@ -183,10 +251,12 @@
                         </div>
                     </div>
 
-                    <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
+                    <div
+                        class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#FF4500]/50 transition-colors group">
                         <div class="flex justify-between items-start mb-6">
                             <span class="text-gray-500 text-xs font-mono uppercase tracking-widest">Deployment</span>
-                            <iconify-icon icon="lucide:activity" class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
+                            <iconify-icon icon="lucide:activity"
+                                class="text-gray-400 text-xl group-hover:text-[#FF4500] transition-colors"></iconify-icon>
                         </div>
                         <div>
                             <h3 class="text-4xl font-serif mb-2" id="statActive">—</h3>
@@ -198,20 +268,25 @@
                 <!-- Fund Utilization & Charts Row -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <!-- Fund Utilization -->
-                    <div class="lg:col-span-2 bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 reveal" style="transition-delay: 100ms;">
-                        <h2 class="text-xl font-serif mb-6 flex items-center gap-2"><iconify-icon icon="lucide:pie-chart" class="text-[#FF4500]"></iconify-icon> Fund Utilization</h2>
-                        
+                    <div class="lg:col-span-2 bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 reveal"
+                        style="transition-delay: 100ms;">
+                        <h2 class="text-xl font-serif mb-6 flex items-center gap-2"><iconify-icon
+                                icon="lucide:pie-chart" class="text-[#FF4500]"></iconify-icon> Fund Utilization</h2>
+
                         <div class="grid grid-cols-3 gap-4 mb-8">
                             <div class="bg-white/5 rounded-2xl p-4 text-center">
-                                <span class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Total Donated</span>
+                                <span class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Total
+                                    Donated</span>
                                 <span class="text-xl font-serif text-[#40916c]" id="fundDonated">—</span>
                             </div>
                             <div class="bg-white/5 rounded-2xl p-4 text-center">
-                                <span class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Total Spent</span>
+                                <span class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Total
+                                    Spent</span>
                                 <span class="text-xl font-serif text-[#FF4500]" id="fundSpent">—</span>
                             </div>
                             <div class="bg-white/5 rounded-2xl p-4 text-center">
-                                <span class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Remaining</span>
+                                <span
+                                    class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Remaining</span>
                                 <span class="text-xl font-serif text-white" id="fundRemaining">—</span>
                             </div>
                         </div>
@@ -222,7 +297,8 @@
                     </div>
 
                     <!-- Charts / Status -->
-                    <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 reveal" style="transition-delay: 200ms;">
+                    <div class="bg-[#111] border border-white/5 rounded-3xl p-6 md:p-8 reveal"
+                        style="transition-delay: 200ms;">
                         <h2 class="text-xl font-serif mb-6">Workforce Status</h2>
                         <div class="relative w-full aspect-square max-h-[250px] mx-auto flex justify-center">
                             <canvas id="volunteerPie"></canvas>
@@ -257,7 +333,11 @@
                                     </tr>
                                 </thead>
                                 <tbody id="recentDonations">
-                                    <tr><td colspan="4"><div class="skeleton"></div></td></tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="skeleton"></div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -279,7 +359,11 @@
                                     </tr>
                                 </thead>
                                 <tbody id="allocationsTable">
-                                    <tr><td colspan="4"><div class="skeleton"></div></td></tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="skeleton"></div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -294,14 +378,14 @@
             <div class="container mx-auto px-6 text-center text-gray-600 text-sm">
                 <p>© 2026 VolunteerHub System. Operations secure.</p>
             </div>
-</footer>
+        </footer>
     </div>
 
     <script>
         // ── Auth & API ─────────────────────────────────────────────
         // API logic is handled by api.js
-        
-        async function apiDashboard()    { return api('/dashboard/summary'); }
+
+        async function apiDashboard() { return api('/dashboard/summary'); }
         async function apiGetDonationStats() { return api('/donations/stats'); }
         async function apiGetVolunteers(params = {}) {
             const q = new URLSearchParams(params).toString();
@@ -350,7 +434,7 @@
         // ── Data Loading ───────────────────────────────────────────
         const user = getUser();
         if (user) {
-            document.getElementById('navAvatar').textContent = user.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+            document.getElementById('navAvatar').textContent = user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
             document.getElementById('navName').textContent = user.name;
             document.getElementById('heroName').textContent = user.name;
             document.getElementById('navRole').textContent = user.role;
@@ -363,17 +447,17 @@
 
         function fmtAmount(n) {
             n = parseFloat(n) || 0;
-            if (n >= 100000) return '₹' + (n/100000).toFixed(1) + 'L';
-            if (n >= 1000) return '₹' + (n/1000).toFixed(1) + 'K';
+            if (n >= 100000) return '₹' + (n / 100000).toFixed(1) + 'L';
+            if (n >= 1000) return '₹' + (n / 1000).toFixed(1) + 'K';
             return '₹' + n.toLocaleString('en-IN');
         }
 
         function fmtFullDate(d) {
-            return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+            return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
         }
 
         function getStatusColor(status) {
-            return { confirmed:'text-[#40916c]', pending:'text-[#f4a261]', failed:'text-[#e63946]' }[status] || 'text-blue-500';
+            return { confirmed: 'text-[#40916c]', pending: 'text-[#f4a261]', failed: 'text-[#e63946]' }[status] || 'text-blue-500';
         }
 
         async function loadDashboard() {
@@ -393,22 +477,22 @@
             document.getElementById('fundRemaining').textContent = fmtAmount(stats.remainingFunds);
 
             const catMap = {};
-            (donatedByCategory || []).forEach(c => { catMap[c.category] = { donated: parseFloat(c.total_donated)||0, spent: 0 }; });
-            (spentByCategory || []).forEach(c => { if (!catMap[c.category]) catMap[c.category] = { donated: 0, spent: 0 }; catMap[c.category].spent = parseFloat(c.total_spent)||0; });
+            (donatedByCategory || []).forEach(c => { catMap[c.category] = { donated: parseFloat(c.total_donated) || 0, spent: 0 }; });
+            (spentByCategory || []).forEach(c => { if (!catMap[c.category]) catMap[c.category] = { donated: 0, spent: 0 }; catMap[c.category].spent = parseFloat(c.total_spent) || 0; });
 
             const catEntries = Object.entries(catMap);
             if (catEntries.length > 0) {
-                const maxVal = Math.max(...catEntries.map(([,v]) => Math.max(v.donated, v.spent)), 1);
+                const maxVal = Math.max(...catEntries.map(([, v]) => Math.max(v.donated, v.spent)), 1);
                 document.getElementById('fundCategoryBars').innerHTML = catEntries.map(([cat, v]) => `
                     <div class="flex items-center text-sm py-2 border-b border-white/5 last:border-0">
                         <span class="w-24 uppercase tracking-widest text-[10px] text-white/70">${cat}</span>
                         <div class="flex-1 flex flex-col gap-1 px-4">
                             <div class="flex items-center gap-2">
-                                <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-[#40916c]" style="width:${Math.round((v.donated/maxVal)*100)}%"></div></div>
+                                <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-[#40916c]" style="width:${Math.round((v.donated / maxVal) * 100)}%"></div></div>
                                 <span class="text-[10px] text-[#40916c] w-12 text-right">${fmtAmount(v.donated)}</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-[#FF4500]" style="width:${Math.round((v.spent/maxVal)*100)}%"></div></div>
+                                <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-[#FF4500]" style="width:${Math.round((v.spent / maxVal) * 100)}%"></div></div>
                                 <span class="text-[10px] text-[#FF4500] w-12 text-right">${fmtAmount(v.spent)}</span>
                             </div>
                         </div>
@@ -452,9 +536,9 @@
             if (!res || !res.ok) return;
             const { byMonth } = res.data;
 
-            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const monthLabels = (byMonth || []).map(m => months[m.month - 1]);
-            const monthVals   = (byMonth || []).map(m => parseFloat(m.total));
+            const monthVals = (byMonth || []).map(m => parseFloat(m.total));
 
             const ctx1 = document.getElementById('donationChart').getContext('2d');
             Chart.defaults.color = 'rgba(255,255,255,0.5)';
@@ -463,48 +547,48 @@
             donChart = new Chart(ctx1, {
                 type: 'line',
                 data: {
-                    labels: monthLabels.length ? monthLabels : months.slice(0,6),
-                    datasets: [{ 
-                        label:'Inflow (₹)', 
-                        data: monthVals.length ? monthVals : [0,0,0,0,0,0],
-                        borderColor: '#FF4500', 
+                    labels: monthLabels.length ? monthLabels : months.slice(0, 6),
+                    datasets: [{
+                        label: 'Inflow (₹)',
+                        data: monthVals.length ? monthVals : [0, 0, 0, 0, 0, 0],
+                        borderColor: '#FF4500',
                         backgroundColor: 'rgba(255, 69, 0, 0.1)',
-                        borderWidth: 2, 
+                        borderWidth: 2,
                         tension: 0.4,
                         fill: true
                     }]
                 },
-                options: { 
+                options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins:{legend:{display:false}}, 
-                    scales:{
-                        y:{beginAtZero:true, grid: { color: 'rgba(255,255,255,0.05)' }},
-                        x:{grid: { display: false }}
-                    } 
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
                 }
             });
 
             const vRes = await apiGetVolunteers({ limit: 100 });
             if (vRes && vRes.ok) {
                 const vols = vRes.data.data || [];
-                const statusCount = { active:0, pending:0, inactive:0, on_leave:0 };
+                const statusCount = { active: 0, pending: 0, inactive: 0, on_leave: 0 };
                 vols.forEach(v => { if (statusCount[v.status] !== undefined) statusCount[v.status]++; });
                 const ctx2 = document.getElementById('volunteerPie').getContext('2d');
                 if (volPie) volPie.destroy();
                 volPie = new Chart(ctx2, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Active','Pending','Inactive','On Leave'],
-                        datasets: [{ 
+                        labels: ['Active', 'Pending', 'Inactive', 'On Leave'],
+                        datasets: [{
                             data: [statusCount.active, statusCount.pending, statusCount.inactive, statusCount.on_leave],
-                            backgroundColor:['#40916c','#FF4500','#222222','#666666'], 
-                            borderWidth: 0 
+                            backgroundColor: ['#40916c', '#FF4500', '#222222', '#666666'],
+                            borderWidth: 0
                         }]
                     },
-                    options: { 
+                    options: {
                         responsive: true, maintainAspectRatio: false,
-                        plugins:{legend:{position:'bottom', labels: { boxWidth: 10, font: { size: 10 }}}}, 
-                        cutout:'75%' 
+                        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
+                        cutout: '75%'
                     }
                 });
             }
@@ -514,4 +598,5 @@
         loadCharts();
     </script>
 </body>
+
 </html>
