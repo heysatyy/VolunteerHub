@@ -91,12 +91,6 @@ VolunteerHub_FINAL/
 
 ---
 
-## 🧪 Default Credentials (Local)
-For testing, use the following admin account:
-- **Email**: `admin@volunteerhub.org`
-- **Password**: `password`
-
----
 
 ## 🎓 Faculty Note
 This project demonstrates:
