@@ -1,14 +1,13 @@
 # VolunteerHub — Backend API
-**Node.js + Express + MySQL**
+**Node.js + Express + PostgreSQL/SQLite**
 
 ## Setup
 
 ```bash
 cd backend
 npm install
-cp .env.example .env   # fill in your DB credentials
-mysql -u root -p < schema.sql
-npm run dev
+cp .env.example .env   # Configure PORT and JWT_SECRET
+npm run dev            # Database is automatically initialized (SQLite locally)
 ```
 
 ## API Endpoints
